@@ -1,0 +1,31 @@
+1
+2
+Do you prefer being outside or inside?
+0 1 Inside
+1 0 Outside
+2
+2
+Do you prefer dawn or dusk?
+1 0 Dawn
+0 1 Dusk
+3
+2
+Which would you prefer?
+0 1 A few close friends
+1 0 A large social circle
+4
+2
+Do you have siblings?
+1 0 Yes
+0 1 No
+5
+2
+Do you want lots of pets or just one?
+0 1 Just one
+1 0 Bring them on!
+    
+You're a dog person!
+You love dogs. They're so happy and bouncy.
+
+You're a cat person!
+You love cats. They're independent and can take care of themselves.    
