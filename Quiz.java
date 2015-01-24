@@ -20,11 +20,14 @@ public class Quiz {
     private int numQuestions; // each quiz will have a specific number of questions
     private Question[] questions; // all of the questions in the quiz
     
+    
+    // constructor for xml files
     public Quiz(String filename) 
         throws FileNotFoundException {
         processInput(filename);
     }
     
+    // constructor for txt files
     public Quiz(String filename, int numQs, int numOs) 
         throws FileNotFoundException {
         this.numQuestions = numQs;
@@ -36,20 +39,27 @@ public class Quiz {
         
     }
     
+    // checks if file is .txt or .xml and sends it to the appropriate parser
     private void processInput(String filename) 
         throws FileNotFoundException {
         
         //if file is .txt
         if (filename.matches("(.*)txt$")) {
             Scanner input = new Scanner(new File(filename));
-            //fills all question arrays from file
+            //fills all arrays from txt file
             fillArrays(input);
-        } else if (filename.matches("(.*)xml$")) {
+        } else if (filename.matches("(.*)xml$")) { //if file is xml
             Document dom = parseXmlFile(filename);
+            //fills all arrays from xml file
             processDom(dom);
         }
     }
     
+    /*
+     * Code for parsing xml files begins here
+     */ 
+    
+    // creates a document from xml file
     private Document parseXmlFile(String filename){
         //get the factory
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -74,19 +84,23 @@ public class Quiz {
         return null;
     }
     
+    // processes the document from the xml file and uses it to fill arrays
     private void processDom(Document dom) {
-        //get the root element
+        //get the root element (in this case should be title of quiz)
         Element docEle = dom.getDocumentElement();
         
+        // gets all possible outcomes
+        // note: gets outcomes first because it's necessary to know
+        // number of outcomes when creating Answer objects
         NodeList nl = docEle.getElementsByTagName("Outcome");
         if(nl != null && nl.getLength() > 0) {
             outcomes = new Outcome[nl.getLength()];
             for(int i = 0 ; i < nl.getLength();i++) {
                 
-                //get the question element
+                //get the outcome element
                 Element ol = (Element)nl.item(i);
                 
-                //get the Question object
+                //get the Outcome object
                 Outcome o = getOutcome(ol);
                 
                 //add it to list
@@ -113,34 +127,39 @@ public class Quiz {
         
     }
     
+    // parses through xml inside question element to create Question object
     private Question getQuestion(Element ql) {
-        String text = getTextValue(ql,"Text");
+        String text = getTextValue(ql,"Text"); // question text
         Answer[] answers = null;
         
-        //get a nodelist of questions
+        //get a nodelist of answers
         NodeList nl = ql.getElementsByTagName("Answer");
         if(nl != null && nl.getLength() > 0) {
             answers = new Answer[nl.getLength()];
             for(int i = 0 ; i < nl.getLength();i++) {
                 
-                //get the question element
+                //get the answer element
                 Element al = (Element)nl.item(i);
                 
-                //get the Question object
+                //get the Answer object
                 Answer a = getAnswer(al);
                 
-                //add it to list
+                //add it to list of answers
                 answers[i] = a;
             }
         }
         
+        // currently have question numbers auto set to 0 because
+        // they're stupid and irrelevant but it's a process to take them
+        // out. Not a really long process, but I don't feel like it.
         Question q = new Question(0, text, answers);
         return q;
     }
     
+    // parses through xml within answer element to create Answer object
     private Answer getAnswer(Element al) {
-        String text = getTextValue(al,"Text");
-        int[] values = new int[outcomes.length];
+        String text = getTextValue(al,"Text"); // text of answer
+        int[] values = new int[outcomes.length]; // should correspond to outcomes
         
         NodeList nl = al.getElementsByTagName("Value");
         if(nl != null && nl.getLength() > 0) {
@@ -149,7 +168,9 @@ public class Quiz {
                 //get the value element
                 Element vl = (Element)nl.item(i);
                 
+                // finds the outcome the value corresponds to
                 int outcome = Integer.parseInt(vl.getAttribute("outcome"));
+                // finds the value we're giving that outcome for this answer
                 int value = Integer.parseInt(vl.getFirstChild().getNodeValue());
                 
                 values[outcome] = value;
@@ -197,9 +218,16 @@ public class Quiz {
         return Integer.parseInt(getTextValue(ele,tagName));
     }
     
-    //gets one question from the file
+    /*
+     * Code for parsing txt files begins here
+     */ 
+    
+    //gets one question from the txt file
     private Question importQ(Scanner qs) {
-        int qNum = 0;
+        // question numbers are currently irrelevant and useless, but
+        // they're in the txt files, so if you leave them out the program
+        // will break. Is on the to do list for fixing.
+        int qNum = 0; 
         int numAns = 0;
         if (qs.hasNextInt()) {
             qNum = qs.nextInt(); //imports number of question
@@ -226,7 +254,7 @@ public class Quiz {
         return q; //returns all information as a Question
     }
     
-    //gets an outcome from the file
+    //gets an outcome from the txt file
     private Outcome importO(Scanner data) {
         //System.out.println("in getOutcome");
         String title = data.nextLine(); // gets the outcome name (eg. You're a cat)
@@ -237,7 +265,7 @@ public class Quiz {
         return o; // Returns the outcome
     }
     
-    //fills questions array and outcome array
+    //fills questions array and outcome array from txt file
     private void fillArrays(Scanner data) {
         //System.out.println("made it here");
         for (int i = 0; i < questions.length; i++) {
@@ -250,6 +278,10 @@ public class Quiz {
             outcomes[i] = importO(data); // imports all outcomes from file
         }
     }
+    
+    /*
+     * Code for running the quiz begins here
+     */ 
     
     //asks the user a question, then increments points accordingly
     private void ask(Question q) {
@@ -273,19 +305,21 @@ public class Quiz {
         return this.outcomes[bestVal];
     }
     
+    // runs the quiz
     public void runQuiz() 
         throws FileNotFoundException {
         
+        // asks all the questions
         for (int i = 0; i < questions.length; i++) {
             System.out.print("Question " + (i+1) + "/" + (questions.length) + ": ");
             ask(questions[i]);
         }
         
-        //prints result!
+        // calculates and prints result!
         Outcome result = calcResult();
         System.out.println(result.title); 
         System.out.println(result.text);
-        //for debugging
+        //for debugging (or curiosity)
         Scanner console = new Scanner(System.in);
         System.out.println("View Breakdown? (y/n)");
         String choice = console.next();
@@ -302,6 +336,8 @@ public class Quiz {
         //Quiz animal = new Quiz("dogscats.txt", 5, 2);
         Quiz animal = new Quiz("dogscats.xml");
         animal.runQuiz();
+        //Quiz test = new Quiz("test.xml");
+        //test.runQuiz();
     }
     
 }

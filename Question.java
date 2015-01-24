@@ -39,6 +39,11 @@ public class Question {
         return qNum;
     }
     
+    //returns the array of answers
+    public Answer[] getAnswers() {
+        return answers;
+    }
+    
     //prints question, gets answer from user, returns values of 
     //the chosen answer
     public int[] runQ() {
