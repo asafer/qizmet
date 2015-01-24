@@ -1,0 +1,22 @@
+<Quiz>
+    <Question>
+        <Text>How many siblings do you have?</Text>
+        <Answer>
+            <Text>More than two</Text>
+            <Value outcome="0">30</Value>
+            <Value outcome="1">-5</Value>
+        </Answer>
+        <Answer>
+            <Text>Two or fewer</Text>
+            <Value outcome="1">10</Value>
+        </Answer>
+    </Question>
+    <Outcome>
+        <Title>Cats!</Title>
+        <Text>You LOVE cats!</Text>
+    </Outcome>
+    <Outcome>
+        <Title>Dogs!</Title>
+        <Text>Puppies are da cutest!</Text>
+    </Outcome>
+</Quiz>

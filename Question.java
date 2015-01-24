@@ -48,7 +48,7 @@ public class Question {
             System.out.println((i+1) + ": " + answers[i].getAns());
         }
         int ans = console.nextInt();
-        while (ans > answers.length) {
+        while (ans > answers.length || ans < 1) {
             System.out.println("Not an option!");
             ans = console.nextInt();
         }
